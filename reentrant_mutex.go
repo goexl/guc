@@ -16,35 +16,32 @@ type reentrantMutex struct {
 
 // NewReentrantMutex 创建新的可重入锁
 func NewReentrantMutex() (locker sync.Locker) {
-	rm := &reentrantMutex{
+	return &reentrantMutex{
 		mutex:     sync.Mutex{},
 		owner:     0,
 		recursion: 0,
 	}
-	locker = rm
-
-	return
 }
 
 func (rm *reentrantMutex) Lock() {
-	gid := gid()
-	if gid == atomic.LoadUint64(&rm.owner) {
+	id := gid()
+	if id == atomic.LoadUint64(&rm.owner) {
 		rm.recursion++
 	} else {
 		rm.mutex.Lock()
-		atomic.StoreUint64(&rm.owner, gid)
+		atomic.StoreUint64(&rm.owner, id)
 		rm.recursion = 1
 	}
 }
 
 func (rm *reentrantMutex) Unlock() {
-	gid := gid()
-	if gid != atomic.LoadUint64(&rm.owner) {
-		panic(fmt.Sprintf("错误的协程持有者（%d）：%d！", rm.owner, gid))
+	id := gid()
+	if id != atomic.LoadUint64(&rm.owner) {
+		panic(fmt.Sprintf("错误的协程持有者（%d）：%d！", rm.owner, id))
 	}
 
 	rm.recursion--
-	if 0 != rm.recursion {
+	if 0 < rm.recursion {
 		return
 	}
 
