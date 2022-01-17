@@ -8,24 +8,40 @@ import (
 type WaitGroup struct {
 	sync.WaitGroup
 
-	completed bool
-	mutex     sync.RWMutex
+	delta int
+	mutex reentrantMutex
+}
+
+func (wg *WaitGroup) Add(delta int) {
+	wg.WaitGroup.Add(delta)
+
+	wg.mutex.Lock()
+	defer wg.mutex.Unlock()
+	wg.delta = delta
+}
+
+// Done 完成
+func (wg *WaitGroup) Done() {
+	wg.WaitGroup.Done()
+
+	wg.mutex.Lock()
+	defer wg.mutex.Unlock()
+	wg.delta--
 }
 
 // Wait 等待
 func (wg *WaitGroup) Wait() {
 	wg.WaitGroup.Wait()
 
-	// 结束后，置完成状态
 	wg.mutex.Lock()
 	defer wg.mutex.Unlock()
-	wg.completed = true
+	wg.delta = 0
 }
 
 // Completed 是否已经完成
 func (wg *WaitGroup) Completed() bool {
-	wg.mutex.RLock()
-	defer wg.mutex.RUnlock()
+	wg.mutex.Lock()
+	defer wg.mutex.Unlock()
 
-	return wg.completed
+	return 0 == wg.delta
 }
