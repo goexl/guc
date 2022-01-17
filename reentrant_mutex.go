@@ -6,7 +6,10 @@ import (
 	`sync/atomic`
 )
 
-var _ sync.Locker = (*reentrantMutex)(nil)
+var (
+	_             = NewReentrantMutex
+	_ sync.Locker = (*reentrantMutex)(nil)
+)
 
 type reentrantMutex struct {
 	mutex     sync.Mutex
