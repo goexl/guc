@@ -43,5 +43,5 @@ func (wg *WaitGroup) Completed() bool {
 	wg.mutex.Lock()
 	defer wg.mutex.Unlock()
 
-	return 0 == wg.delta
+	return 0 >= wg.delta
 }
