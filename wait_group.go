@@ -13,19 +13,24 @@ type WaitGroup struct {
 }
 
 func (wg *WaitGroup) Add(delta int) {
-	wg.WaitGroup.Add(delta)
-
 	wg.mutex.Lock()
 	defer wg.mutex.Unlock()
+
+	wg.WaitGroup.Add(delta)
 	wg.delta = delta
 }
 
 // Done 完成
 func (wg *WaitGroup) Done() {
-	wg.WaitGroup.Done()
-
 	wg.mutex.Lock()
 	defer wg.mutex.Unlock()
+
+	// 不允许出现计数为负的情况
+	if 0 >= wg.delta {
+		return
+	}
+
+	wg.WaitGroup.Done()
 	wg.delta--
 }
 
