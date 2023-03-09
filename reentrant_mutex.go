@@ -1,9 +1,9 @@
 package guc
 
 import (
-	`fmt`
-	`sync`
-	`sync/atomic`
+	"fmt"
+	"sync"
+	"sync/atomic"
 )
 
 var (
@@ -18,7 +18,7 @@ type reentrantMutex struct {
 }
 
 // NewReentrantMutex 创建新的可重入锁
-func NewReentrantMutex() (locker sync.Locker) {
+func NewReentrantMutex() sync.Locker {
 	return &reentrantMutex{
 		mutex:     sync.Mutex{},
 		owner:     0,

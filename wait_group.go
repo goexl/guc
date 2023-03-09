@@ -1,7 +1,7 @@
 package guc
 
 import (
-	`sync`
+	"sync"
 )
 
 // WaitGroup 等待组，是系统sync.WaitGroup的增强版
@@ -20,7 +20,6 @@ func (wg *WaitGroup) Add(delta int) {
 	wg.delta = delta
 }
 
-// Done 完成
 func (wg *WaitGroup) Done() {
 	wg.mutex.Lock()
 	defer wg.mutex.Unlock()
@@ -34,7 +33,6 @@ func (wg *WaitGroup) Done() {
 	wg.delta--
 }
 
-// Wait 等待
 func (wg *WaitGroup) Wait() {
 	wg.WaitGroup.Wait()
 
@@ -43,7 +41,6 @@ func (wg *WaitGroup) Wait() {
 	wg.delta = 0
 }
 
-// Completed 是否已经完成
 func (wg *WaitGroup) Completed() bool {
 	wg.mutex.Lock()
 	defer wg.mutex.Unlock()
