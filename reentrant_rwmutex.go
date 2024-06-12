@@ -1,9 +1,9 @@
 package guc
 
 import (
-	`fmt`
-	`sync`
-	`sync/atomic`
+	"fmt"
+	"sync"
+	"sync/atomic"
 )
 
 var (
@@ -12,17 +12,17 @@ var (
 )
 
 type reentrantRWMutex struct {
-	mutex     sync.RWMutex
-	owner     uint64
 	recursion int32
+	owner     uint64
+	mutex     *sync.RWMutex
 }
 
 // NewReentrantRWMutex 创建新的可重入锁
 func NewReentrantRWMutex() (locker RWLocker) {
 	rm := &reentrantRWMutex{
-		mutex:     sync.RWMutex{},
-		owner:     0,
 		recursion: 0,
+		owner:     0,
+		mutex:     new(sync.RWMutex),
 	}
 	locker = rm
 
