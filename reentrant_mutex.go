@@ -14,6 +14,7 @@ var (
 type reentrantMutex struct {
 	owner     uint64
 	recursion int32
+	padding   [4]byte // !字节对齐，填充对齐间隙
 	mutex     *sync.Mutex
 }
 
@@ -26,28 +27,28 @@ func NewReentrantMutex() sync.Locker {
 	}
 }
 
-func (rm *reentrantMutex) Lock() {
+func (m *reentrantMutex) Lock() {
 	id := gid()
-	if id == atomic.LoadUint64(&rm.owner) {
-		rm.recursion++
+	if id == atomic.LoadUint64(&m.owner) {
+		m.recursion++
 	} else {
-		rm.mutex.Lock()
-		atomic.StoreUint64(&rm.owner, id)
-		rm.recursion = 1
+		m.mutex.Lock()
+		atomic.StoreUint64(&m.owner, id)
+		m.recursion = 1
 	}
 }
 
-func (rm *reentrantMutex) Unlock() {
+func (m *reentrantMutex) Unlock() {
 	id := gid()
-	if id != atomic.LoadUint64(&rm.owner) {
-		panic(fmt.Sprintf("错误的协程持有者（%d）：%d！", rm.owner, id))
+	if id != atomic.LoadUint64(&m.owner) {
+		panic(fmt.Sprintf("错误的协程持有者（%d）：%d！", m.owner, id))
 	}
 
-	rm.recursion--
-	if 0 < rm.recursion {
+	m.recursion--
+	if 0 < m.recursion {
 		return
 	}
 
-	atomic.StoreUint64(&rm.owner, 0)
-	rm.mutex.Unlock()
+	atomic.StoreUint64(&m.owner, 0)
+	m.mutex.Unlock()
 }

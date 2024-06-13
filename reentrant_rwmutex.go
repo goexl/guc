@@ -14,6 +14,7 @@ var (
 type reentrantRWMutex struct {
 	owner     uint64
 	recursion int32
+	padding   [4]byte // !字节对齐，填充对齐间隙
 	mutex     *sync.RWMutex
 }
 
@@ -29,54 +30,54 @@ func NewReentrantRWMutex() (locker RWLocker) {
 	return
 }
 
-func (rrm *reentrantRWMutex) Lock() {
-	gid := gid()
-	if gid == atomic.LoadUint64(&rrm.owner) {
-		rrm.recursion++
+func (m *reentrantRWMutex) Lock() {
+	id := gid()
+	if id == atomic.LoadUint64(&m.owner) {
+		m.recursion++
 	} else {
-		rrm.mutex.Lock()
-		atomic.StoreUint64(&rrm.owner, gid)
-		rrm.recursion = 1
+		m.mutex.Lock()
+		atomic.StoreUint64(&m.owner, id)
+		m.recursion = 1
 	}
 }
 
-func (rrm *reentrantRWMutex) Unlock() {
-	gid := gid()
-	if gid != atomic.LoadUint64(&rrm.owner) {
-		panic(fmt.Sprintf("错误的协程持有者（%d）：%d！", rrm.owner, gid))
+func (m *reentrantRWMutex) Unlock() {
+	id := gid()
+	if id != atomic.LoadUint64(&m.owner) {
+		panic(fmt.Sprintf("错误的协程持有者（%d）：%d！", m.owner, id))
 	}
 
-	rrm.recursion--
-	if 0 != rrm.recursion {
+	m.recursion--
+	if 0 != m.recursion {
 		return
 	}
 
-	atomic.StoreUint64(&rrm.owner, 0)
-	rrm.mutex.Unlock()
+	atomic.StoreUint64(&m.owner, 0)
+	m.mutex.Unlock()
 }
 
-func (rrm *reentrantRWMutex) RLock() {
-	gid := gid()
-	if gid == atomic.LoadUint64(&rrm.owner) {
-		rrm.recursion++
+func (m *reentrantRWMutex) RLock() {
+	id := gid()
+	if id == atomic.LoadUint64(&m.owner) {
+		m.recursion++
 	} else {
-		rrm.mutex.RLock()
-		atomic.StoreUint64(&rrm.owner, gid)
-		rrm.recursion = 1
+		m.mutex.RLock()
+		atomic.StoreUint64(&m.owner, id)
+		m.recursion = 1
 	}
 }
 
-func (rrm *reentrantRWMutex) RUnlock() {
-	gid := gid()
-	if gid != atomic.LoadUint64(&rrm.owner) {
-		panic(fmt.Sprintf("错误的协程持有者（%d）：%d！", rrm.owner, gid))
+func (m *reentrantRWMutex) RUnlock() {
+	id := gid()
+	if id != atomic.LoadUint64(&m.owner) {
+		panic(fmt.Sprintf("错误的协程持有者（%d）：%d！", m.owner, id))
 	}
 
-	rrm.recursion--
-	if 0 != rrm.recursion {
+	m.recursion--
+	if 0 != m.recursion {
 		return
 	}
 
-	atomic.StoreUint64(&rrm.owner, 0)
-	rrm.mutex.RUnlock()
+	atomic.StoreUint64(&m.owner, 0)
+	m.mutex.RUnlock()
 }
