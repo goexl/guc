@@ -14,8 +14,7 @@ var (
 type reentrantMutex struct {
 	owner     uint64
 	recursion int32
-	padding   [4]byte // !字节对齐，填充对齐间隙
-	mutex     *sync.Mutex
+	mutex     sync.Mutex
 }
 
 // NewReentrantMutex 创建新的可重入锁
@@ -23,7 +22,7 @@ func NewReentrantMutex() sync.Locker {
 	return &reentrantMutex{
 		owner:     0,
 		recursion: 0,
-		mutex:     new(sync.Mutex),
+		mutex:     sync.Mutex{},
 	}
 }
 
