@@ -12,16 +12,16 @@ var (
 )
 
 type reentrantRWMutex struct {
-	recursion int32
 	owner     uint64
+	recursion int32
 	mutex     *sync.RWMutex
 }
 
 // NewReentrantRWMutex 创建新的可重入锁
 func NewReentrantRWMutex() (locker RWLocker) {
 	rm := &reentrantRWMutex{
-		recursion: 0,
 		owner:     0,
+		recursion: 0,
 		mutex:     new(sync.RWMutex),
 	}
 	locker = rm

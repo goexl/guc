@@ -12,16 +12,16 @@ var (
 )
 
 type reentrantMutex struct {
-	recursion int32
 	owner     uint64
+	recursion int32
 	mutex     *sync.Mutex
 }
 
 // NewReentrantMutex 创建新的可重入锁
 func NewReentrantMutex() sync.Locker {
 	return &reentrantMutex{
-		recursion: 0,
 		owner:     0,
+		recursion: 0,
 		mutex:     new(sync.Mutex),
 	}
 }
