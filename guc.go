@@ -1,13 +1,9 @@
 package guc
 
 import (
-	"github.com/goexl/guc/internal/builder"
+	"github.com/goexl/guc/internal"
 )
 
-func Lock() *builder.Lock {
-	return builder.NewLock()
-}
-
-func Wait() *builder.Wait {
-	return builder.NewWait()
+func New() *internal.Factory {
+	return internal.NewFactory()
 }

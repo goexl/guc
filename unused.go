@@ -1,6 +1,3 @@
 package guc
 
-var (
-	_ = Lock()
-	_ = Wait
-)
+var _ = New

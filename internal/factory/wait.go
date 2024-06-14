@@ -1,4 +1,4 @@
-package builder
+package factory
 
 import (
 	"github.com/goexl/guc/internal/sync/core"
