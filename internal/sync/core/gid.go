@@ -1,12 +1,12 @@
-package guc
+package core
 
 import (
-	`bytes`
-	`runtime`
-	`strconv`
+	"bytes"
+	"runtime"
+	"strconv"
 )
 
-func gid() (id uint64) {
+func Gid() (id uint64) {
 	buffer := make([]byte, 64)
 	buffer = buffer[:runtime.Stack(buffer, false)]
 	buffer = bytes.TrimPrefix(buffer, []byte("goroutine "))
