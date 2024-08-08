@@ -8,14 +8,19 @@ import (
 
 // Group 等待组，是系统sync.WaitGroup的增强版
 type Group struct {
-	sync.WaitGroup
+	*sync.WaitGroup
 
 	delta int
 	mutex sync.Locker
 }
 
 func NewGroup(delta int) *Group {
+	wg := new(sync.WaitGroup)
+	wg.Add(delta)
+
 	return &Group{
+		WaitGroup: wg,
+
 		delta: delta,
 		mutex: mutex.NewReentrant(),
 	}
