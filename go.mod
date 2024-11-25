@@ -4,7 +4,7 @@ go 1.23
 
 require (
 	github.com/goexl/collection v0.0.1
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 )
 
 require (
